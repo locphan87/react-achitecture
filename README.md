@@ -1,6 +1,6 @@
-# React Native Architecture
+# React Architecture
 
-Core principles, patterns and best practices for building a react native application
+Core principles, patterns and best practices for building a react application
 
 Table of Contents
 =================
@@ -25,8 +25,6 @@ Table of Contents
       * [GraphQL mutations](#graphql-mutations)
    * [Testing guidelines](#testing-guidelines)
 * [Technical decisions](#technical-decisions)
-   * [Why Expo?](#why-expo)
-      * [Expo’s Shortcomings](#expos-shortcomings)
    * [Why Feature-Oriented Architecture?](#why-feature-oriented-architecture)
    * [Why TypeScript?](#why-typescript)
    * [Why Functional Javascript?](#why-functional-javascript)
@@ -46,16 +44,15 @@ Table of Contents
 
 ### Application Blueprint
 
-* Always up-to-date [React Native](https://facebook.github.io/react-native/) scaffolding
+* Up-to-date [React](https://facebook.github.io/react) scaffolding
 * Modular and well-documented structure for application code
-* [Expo](https://expo.io/) Easy to build a React Native app without any build configuration
 * [Redux](http://redux.js.org/) for safe and reasonable state management
 * Painless React forms with [formik](https://github.com/jaredpalmer/formik)
-* [React Navigation](https://reactnavigation.org/) for awesome navigation with 60fps transitions
+* [React Router](https://reacttraining.com/react-router/) for declarative routing
 * [Typescript](https://www.typescriptlang.org/) for static type checking
 * [Ramda](https://github.com/ramda/ramda) and [Ramda Adjunct](https://github.com/char0n/ramda-adjunct) for functional Javascript
 * [Recompose](https://github.com/acdlite/recompose) for building higher order components
-* [Glamorous Native](https://github.com/robinpowered/glamorous-native) for creating UI components
+* [Emotion](https://emotion.sh/) for creating UI components
 * Feature flags
 * Clean and testable service layer for interacting with GraphQL queries and mutations
 * :star: Multi-environment configuration (dev, staging, production,...) for iOS and Android
@@ -319,44 +316,6 @@ reliability of your code". A pure function is a function that always returns the
 feature‑branch to a remote repository.
 
 ## Technical decisions
-
-### Why Expo?
-
-When creating a new React Native app, it’s common to think in terms of two choices. Using Expo. Or not using Expo. Even the official React Native [Getting Started](https://facebook.github.io/react-native/docs/getting-started.html) docs describe it in these terms.
-
-* Serving an Expo project for local development
-![Serving an Expo project for local development](https://docs.expo.io/static/images/generated/v30.0.0/workflow/fetch-app-from-xde.png)
-
-* Opening a deployed Expo app
-![Opening a deployed Expo app](https://docs.expo.io/static/images/generated/v30.0.0/workflow/fetch-app-production.png)
-
-Expo has become incredibly popular for several reasons:
-
-1. You can test on a real device without having an Apple Developer Account ($99/year). This is accomplished via their free Expo app in the Google Play
-and App Store. Inside the Expo app, you can run your own app. It’s not exactly like installing your app on a device since you’re really just in the Expo
-app. But it’s still pretty cool.
-2. Expo handles a bunch of config steps for deploying your app. A lot of people learning React Native are not coming from a mobile development
-background, so doing this configuration themselves seems daunting.
-3. Expo has an SDK to handle all kinds of things like using the camera, accelerometer, maps, location tracking, analytics, etc. Granted, most of these
-features can be implemented using open source packages, but it is nice that Expo provides so many of these in one place.
-
-#### Expo’s Shortcomings
-
-When you create your app via Expo, it creates a file structure for you that does not include the iOS and Android project files. Some features require you to tweak these files though. One example is adding a third‑party push notification library. To do this, you must do the following in that project file:
-
-* Turn on the push notifications capability.
-* Link the push notification library to your app’s bundle (something that react-native link would likely do for you, depending on the push library
-you’re implementing).
-
-With Expo, you can’t do those steps because there is no project file to do them in. So here is where the road leads to “detaching” from Expo. Detaching will produce these project files so you can configure them.
-
-There are two options when detaching from Expo.
-
-1. Completely remove Expo. This gives you a project similar to what you’d get with `react-native init`.
-2. Partially remove Expo (often referred to as ExpoKit). This allows you to still use the Expo SDK. Your Javascript continues to be hosted remotely and
-updated via `exp publish`.
-
-Both options give you the iOS and Android project files so you can configure them yourself.
 
 ### Why Feature-Oriented Architecture?
 
