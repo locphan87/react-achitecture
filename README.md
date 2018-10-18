@@ -31,7 +31,8 @@ Table of Contents
    * [Why Ramda over lodash, or underscore?](#why-ramda-over-lodash-or-underscore)
    * [Why prefer Stateless Functional Component over Stateful Component, Higher Order Component and Recompose?](#why-prefer-stateless-functional-component-over-stateful-component-higher-order-component-and-recompose)
    * [Why prefer formik over redux-form?](#why-prefer-formik-over-redux-form)
-   * [Why Glamorous Native](#why-glamorous-native)
+   * [Why Emotion?](#why-emotion)
+   * [Why Tailwind CSS?](#why-tailwind-css)
    * [Why prefer date-fns over moment?](#why-prefer-date-fns-over-moment)
 * [Recipes](#recipes)
    * [Render multiple snapshots for a React component](#render-multiple-snapshots-for-a-react-component)
@@ -53,10 +54,11 @@ Table of Contents
 * [Ramda](https://github.com/ramda/ramda) and [Ramda Adjunct](https://github.com/char0n/ramda-adjunct) for functional Javascript
 * [Recompose](https://github.com/acdlite/recompose) for building higher order components
 * [Emotion](https://emotion.sh/) for creating UI components
+* [i18n-js](https://github.com/fnando/i18n-js#setting-up) for providing i18n translations
 * Feature flags
 * Clean and testable service layer for interacting with GraphQL queries and mutations
-* :star: Multi-environment configuration (dev, staging, production,...) for iOS and Android
-* :star: Built-in error handling, loading, updating and customizable screens
+* Multi-environment configuration (dev, staging, production,...) for iOS and Android
+* Built-in error handling, loading, updating and customizable screens
 
 ### Testing Setup
 
@@ -68,6 +70,7 @@ Table of Contents
 * [TSLint](https://palantir.github.io/tslint/) An extensible linter for the TypeScript language
 * [Prettier](https://github.com/prettier/prettier) as an opinionated code formatter
 * [lint-staged](https://github.com/okonet/lint-staged) Run linters on git staged files
+* [json-server](https://github.com/typicode/json-server) for a full fake REST API
 * [insomnia](https://insomnia.rest/) Powerful HTTP and GraphQL tool belt
 
 ## Technical design
@@ -88,7 +91,7 @@ WRITE SMALL, REUSABLE AND COMPOSABLE FUNCTIONS
 ├── Login.lifecycle.tsx
 ├── Login.handler.tsx
 ├── Login.reducer.tsx
-├── Login.screen.tsx
+├── Login.page.tsx
 ├── Login.selector.tsx
 ├── Login.view.tsx
 ```
@@ -227,10 +230,10 @@ Location: `./src/configs/`
 
 Location: `./src/modules/<ModuleName>`
 
-* Screen component (stateful) `<ModuleName>.screen.tsx`
-* State selector for screen component `<ModuleName>.selector.tsx`
-* Event handlers for screen component `<ModuleName>.handler.tsx`
-* Lifecycle callbacks for screen component `<ModuleName>.lifecycle.tsx`
+* Page component (stateful) `<ModuleName>.page.tsx`
+* State selector for page component `<ModuleName>.selector.tsx`
+* Event handlers for page component `<ModuleName>.handler.tsx`
+* Lifecycle callbacks for page component `<ModuleName>.lifecycle.tsx`
 * Module's reducer `<ModuleName>.reducer.tsx`
 * Module's utility functions `<ModuleName>.util.tsx`
 * UI view component `<ModuleName>.view.tsx`
@@ -334,7 +337,7 @@ Let’s look at what the folder structure would look like for our `Login` module
 ├── Login.lifecycle.tsx
 ├── Login.handler.tsx
 ├── Login.reducer.tsx
-├── Login.screen.tsx
+├── Login.page.tsx
 ├── Login.selector.tsx
 ├── Login.view.tsx
 ├── Login.view.style.tsx
@@ -439,7 +442,7 @@ By using Functional components you encourage:
 * Easily Unit Tested — Easily test interface with enzyme/jest
 * Easily Mocked — Easily mock props for different situations
 
-And there we were, digging the pattern, and off to the races. We hit a couple of problems along the way. It became super tedious to constantly write the same HOC syntax for simple things, we didn’t have patterns for combining multiple enhancers together, and we couldn’t prevent the development of duplicate enhancers. It was getting hard to prove the value of this pattern as people were getting bogged down in the syntax and the ideas of HOCs (much like engineers do).
+And there we were, digging the pattern, and off to the races. We hit a couple of problems along the way. It became super tedious to constantly write the same HOC syntax for simple things, we didn't have patterns for combining multiple enhancers together, and we couldn't prevent the development of duplicate enhancers. It was getting hard to prove the value of this pattern as people were getting bogged down in the syntax and the ideas of HOCs (much like engineers do).
 
 We needed something that
 
@@ -464,7 +467,10 @@ Why not `redux-form`?
 2. `redux-form` calls your entire top‑level Redux reducer multiple times ON EVERY SINGLE KEYSTROKE. This is fine for small apps, but as your Redux app grows, input latency will continue to increase if you use `redux-form`
 3. `redux-form` is 22.5 kB minified gzipped (Formik is 12.7 kB)
 
-### Why Glamorous Native
+### Why Emotion?
+// TODO
+
+### Why Tailwind CSS?
 // TODO
 
 ### Why prefer date-fns over moment?
@@ -522,37 +528,26 @@ describe('sub render', () => {
 ### Pattern matching on values
 
 ```js
-import { match } from '../../utils'
+import match from 'match-values'
 
-const fontSize = match(fontStyle)({
+const pattern = {
   h1: 20,
   h2: 18,
   title: 16,
   description: 14,
   _: 13 // use _ for the default case
-})
+}
+const fontSize = match(fontStyle, pattern)
 // fontStyle = 'title' => 16
 // fontStyle = 'unknown' => 13
 ```
 
-```js
-import { match } from '../../utils'
-
-// the result of each case could be anything
-// primitive values, objects, functions,...
-
-const handleError = match(error)({
-  NOT_FOUND: () => showErrorMessage('Page not found'),
-  TIMEOUT: () => showErrorMessage('Page has timed out'),
-  _: NOOP
-})
-handleError()
-```
+[Details](https://github.com/phanhoangloc/match-values#usage)
 
 ### Pattern matching on functions
 
 ```js
-// A classical implementation
+// A common implementation
 const getIconNameFromIndex = (index, rating) => {
   if (index <= rating) {
     return 'ic_rating_full'
@@ -565,8 +560,7 @@ const getIconNameFromIndex = (index, rating) => {
 ```
 
 ```js
-// USING RAMDA
-// for simple `multiclause` function
+// a simple `multiclause` function
 import { cond, compose, lte, always, T, subtract, gt } from 'ramda'
 
 // isHalfRating: (number, number) => bool
@@ -578,50 +572,10 @@ const getIconNameFromIndex = cond([
 ])
 ```
 
-```js
-// USING TAILORED
-// for more advanced patterns
-import tailored from 'tailored'
-
-const { variable, clause, defmatch } = tailored
-const $ = variable()
-// isHalfRating: (number, number) => bool
-const isHalfRating = compose(gt(1), subtract)
-
-const getIconNameFromIndex = defmatch(
-  clause([$, $], always('ic_rating_full'), lte),
-  clause([$, $], always('ic_rating_half'), isHalfRating),
-  clause([$, $], always('ic_rating_empty'))
-)
-```
-
 ### Pattern matching on components
 
 ```js
-// A classical implementation
-import React from 'react'
-...
-const MyComponent = props => {
-  if (props.loading) {
-    return <Loading />
-  }
-  if (props.errors) {
-    return <Text>Something went wrong</Text>
-  }
-  if (equals(conditionA, true)) {
-    return <ComponentA {...props} />
-  }
-  if (equals(conditionB, true)) {
-    return <ComponentB {...props} />
-  }
-  ...
-
-  return <View><MainComponent /></View>
-}
-```
-
-```js
-import { renderWhen } from '../../hoc'
+import { renderWhen } from 'react-native-hocs'
 
 const MyComponent = props => <View><MainComponent /></View>
 const isLoading = props => {}
@@ -635,7 +589,7 @@ const enhance = renderWhen([
   },
   {
     when: hasError,
-    render: Error
+    render: ErrorComponent
   },
   {
     when: isSomethingA,
@@ -649,3 +603,5 @@ const enhance = renderWhen([
 
 export default enhance(MyComponent)
 ```
+
+[Details](https://github.com/phanhoangloc/react-native-hocs#renderwhen)
